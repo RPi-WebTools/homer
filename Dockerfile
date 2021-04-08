@@ -4,7 +4,7 @@ FROM node:lts-alpine as build-stage
 WORKDIR /app
 
 COPY package*.json ./
-RUN yarn install --frozen-lockfile
+RUN yarn install --frozen-lockfile --network-timeout 100000
 
 COPY . .
 RUN yarn build
