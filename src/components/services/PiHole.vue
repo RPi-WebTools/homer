@@ -79,6 +79,7 @@ export default {
 .status {
   font-size: 0.8rem;
   color: var(--text-title);
+  align-self: flex-end;
 
   &.enabled:before {
     background-color: #94e185;
