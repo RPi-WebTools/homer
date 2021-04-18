@@ -12,6 +12,7 @@ steps:
   - name: docker-build
     image: plugins/docker
     settings:
+      registry: registry.docker.home:5000
       repo: registry.docker.home:5000/rpi-webtools/lynxl
       auto_tag: true
       auto_tag_suffix: linux_amd64
