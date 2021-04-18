@@ -3,8 +3,16 @@ type: docker
 name: default
 
 steps:
-  - name: build
+  - name: default-build
     image: node:lts-alpine
     commands:
-      - yarn --version
+      - ls
       - yarn install
+      - yarn build
+  - name: docker-build
+    image: plugins/docker
+    settings:
+      repo: registry.docker.home:5000/rpi-webtools/lynxl
+      auto_tag: true
+      auto_tag_suffix: linux_amd64
+      insecure: true
