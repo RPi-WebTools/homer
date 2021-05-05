@@ -25,9 +25,7 @@
                 </template>
               </p>
             </div>
-            <div v-if="api" class="status" :class="api.status">
-              {{ api.status }}
-            </div>
+            <ServiceHeartbeat v-if="item.docker_host && item.docker_name" v-bind:item="item" />
           </div>
           <div class="tag" :class="item.tagstyle" v-if="item.tag">
             <strong class="tag-text">#{{ item.tag }}</strong>
@@ -39,8 +37,13 @@
 </template>
 
 <script>
+import ServiceHeartbeat from "../ServiceHeartbeat.vue";
+
 export default {
   name: "PiHole",
+  components: {
+    ServiceHeartbeat
+  },
   props: {
     item: Object,
   },
@@ -75,32 +78,5 @@ export default {
 <style scoped lang="scss">
 .media-left img {
   max-height: 100%;
-}
-.status {
-  font-size: 0.8rem;
-  color: var(--text-title);
-  align-self: flex-end;
-
-  &.enabled:before {
-    background-color: #94e185;
-    border-color: #78d965;
-    box-shadow: 0 0 4px 1px #94e185;
-  }
-
-  &.disabled:before {
-    background-color: #c9404d;
-    border-color: #c42c3b;
-    box-shadow: 0 0 4px 1px #c9404d;
-  }
-
-  &:before {
-    content: " ";
-    display: inline-block;
-    width: 7px;
-    height: 7px;
-    margin-right: 10px;
-    border: 1px solid #000;
-    border-radius: 7px;
-  }
 }
 </style>

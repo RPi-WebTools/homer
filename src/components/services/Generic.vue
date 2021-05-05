@@ -24,6 +24,7 @@
                 {{ item.subtitle }}
               </p>
             </div>
+            <ServiceHeartbeat v-if="item.docker_host && item.docker_name" v-bind:item="item" />
           </div>
           <div class="tag" :class="item.tagstyle" v-if="item.tag">
             <strong class="tag-text">#{{ item.tag }}</strong>
@@ -35,8 +36,13 @@
 </template>
 
 <script>
+import ServiceHeartbeat from "../ServiceHeartbeat.vue";
+
 export default {
   name: "Generic",
+  components: {
+    ServiceHeartbeat
+  },
   props: {
     item: Object,
   },
