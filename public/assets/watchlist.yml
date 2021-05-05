@@ -1,0 +1,16 @@
+---
+subtitle: "Movie & TV Watchlist"
+is_dashboard: false
+
+message: ~
+
+links:
+  - name: "Home"
+    icon: "fas fa-home"
+    url: "#"
+  - name: "IMDb"
+    icon: "fab fa-imdb"
+    url: "https://www.imdb.com/"
+    target: "_blank"
+
+services:

@@ -56,55 +56,60 @@
           @network-status-update="offline = $event"
         />
         <div v-if="!offline">
-          <!-- Optional messages -->
-          <Message :item="config.message" />
+          <div v-if="config.is_dashboard">
+            <!-- Optional messages -->
+            <Message :item="config.message" />
 
-          <!-- Horizontal layout -->
-          <div v-if="!vlayout || filter" class="columns is-multiline">
-            <template v-for="group in services">
-              <h2 v-if="group.name" class="column is-full group-title">
-                <i v-if="group.icon" :class="['fa-fw', group.icon]"></i>
-                <div v-else-if="group.logo" class="group-logo media-left">
-                  <figure class="image is-48x48">
-                    <img :src="group.logo" :alt="`${group.name} logo`" />
-                  </figure>
-                </div>
-                {{ group.name }}
-              </h2>
-              <Service
-                v-for="(item, index) in group.items"
-                :key="group.name + index"
-                v-bind:item="item"
-                :class="['column', `is-${12 / config.columns}`]"
-              />
-            </template>
-          </div>
-
-          <!-- Vertical layout -->
-          <div
-            v-if="!filter && vlayout"
-            class="columns is-multiline layout-vertical"
-          >
-            <div
-              :class="['column', `is-${12 / config.columns}`]"
-              v-for="group in services"
-              :key="group.name"
-            >
-              <h2 v-if="group.name" class="group-title">
-                <i v-if="group.icon" :class="['fa-fw', group.icon]"></i>
-                <div v-else-if="group.logo" class="group-logo media-left">
-                  <figure class="image is-48x48">
-                    <img :src="group.logo" :alt="`${group.name} logo`" />
-                  </figure>
-                </div>
-                {{ group.name }}
-              </h2>
-              <Service
-                v-for="(item, index) in group.items"
-                :key="group.name + index"
-                v-bind:item="item"
-              />
+            <!-- Horizontal layout -->
+            <div v-if="!vlayout || filter" class="columns is-multiline">
+              <template v-for="group in services">
+                <h2 v-if="group.name" class="column is-full group-title">
+                  <i v-if="group.icon" :class="['fa-fw', group.icon]"></i>
+                  <div v-else-if="group.logo" class="group-logo media-left">
+                    <figure class="image is-48x48">
+                      <img :src="group.logo" :alt="`${group.name} logo`" />
+                    </figure>
+                  </div>
+                  {{ group.name }}
+                </h2>
+                <Service
+                  v-for="(item, index) in group.items"
+                  :key="group.name + index"
+                  v-bind:item="item"
+                  :class="['column', `is-${12 / config.columns}`]"
+                />
+              </template>
             </div>
+
+            <!-- Vertical layout -->
+            <div
+              v-if="!filter && vlayout"
+              class="columns is-multiline layout-vertical"
+            >
+              <div
+                :class="['column', `is-${12 / config.columns}`]"
+                v-for="group in services"
+                :key="group.name"
+              >
+                <h2 v-if="group.name" class="group-title">
+                  <i v-if="group.icon" :class="['fa-fw', group.icon]"></i>
+                  <div v-else-if="group.logo" class="group-logo media-left">
+                    <figure class="image is-48x48">
+                      <img :src="group.logo" :alt="`${group.name} logo`" />
+                    </figure>
+                  </div>
+                  {{ group.name }}
+                </h2>
+                <Service
+                  v-for="(item, index) in group.items"
+                  :key="group.name + index"
+                  v-bind:item="item"
+                />
+              </div>
+            </div>
+          </div>
+          <div v-else>
+            <Kanban />
           </div>
         </div>
       </div>
@@ -134,6 +139,7 @@ import SearchInput from "./components/SearchInput.vue";
 import SettingToggle from "./components/SettingToggle.vue";
 import DarkMode from "./components/DarkMode.vue";
 import DynamicTheme from "./components/DynamicTheme.vue";
+import Kanban from "./components/watchlist/Kanban.vue";
 
 import defaultConfig from "./assets/defaults.yml";
 
@@ -148,6 +154,7 @@ export default {
     SettingToggle,
     DarkMode,
     DynamicTheme,
+    Kanban,
   },
   data: function () {
     return {
