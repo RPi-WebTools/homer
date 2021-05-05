@@ -6,9 +6,10 @@ title: "Lynxl"
 subtitle: "Viperinius Dashboard"
 logo: "lynxl-logo.png"
 # icon: "fas fa-skull-crossbones" # Optional icon
+is_dashboard: true
 
 header: true
-footer: '<p>Created with <span class="has-text-danger">❤️</span> with <a href="https://bulma.io/">bulma</a>, <a href="https://vuejs.org/">vuejs</a> & <a href="https://fontawesome.com/">font awesome</a> // Fork me on <a href="https://github.com/bastienwirtz/homer"><i class="fab fa-github-alt"></i></a></p>' # set false if you want to hide it.
+footer: '<p>Lynxl Dashboard by Viperinius // This is a fork of <a href="https://github.com/bastienwirtz/homer"><i class="fab fa-github-alt"></i></a>.</p>'
 
 # Optional theme customization
 theme: default
@@ -42,16 +43,16 @@ colors:
 message:
   #url: https://b4bz.io
   style: "is-dark" # See https://bulma.io/documentation/components/message/#colors for styling options.
-  title: "Demo !"
-  icon: "fa fa-grin"
-  content: "This is a dummy homepage demo. <br /> Find more information on <a href='https://github.com/bastienwirtz/homer'>github.com/bastienwirtz/homer</a>"
+  title: ""
+#  icon: "fa fa-grin"
+  content: ""
 
 # Optional navbar
-# links: [] # Allows for navbar (dark mode, layout, and search) without any links
+#links: [] # Allows for navbar (dark mode, layout, and search) without any links
 links:
-  - name: "Statpings"
-    icon: "fas fa-signal"
-    url: "#statpings" 
+  - name: "Watchlist"
+    icon: "far fa-eye"
+    url: "#watchlist" 
 
 # Services
 # First level array represent a group.
@@ -64,18 +65,32 @@ services:
         logo: "assets/tools/pihole.png"
         tag: "net"
         url: "https://pihole.home/admin"
+        docker_host: "z1.docker.home"
+        docker_name: "pihole"
         type: "PiHole"
-        target: "_blank" # optional html a tag target attribute
+        target: "_blank"
       - name: "Unbound"
         logo: "assets/tools/unbound.png"
         subtitle: "Recursive DNS resolver"
         tag: "net"
         url: "#"
+        docker_host: "z1.docker.home"
+        docker_name: "unbound"
       - name: "Statping"
         logo: "assets/tools/statping.png"
         subtitle: "Healthcheck for services"
         tag: "net"
-        url: "#statpings"
+        url: "https://stats.lynxl.home"
+        docker_host: "z1.docker.home"
+        docker_name: "statping"
+        target: "_blank"
+      - name: "FRITZ!Box 7590"
+        logo: "assets/tools/fritzbox.png"
+        subtitle: "Router"
+        tag: "net"
+        url: "https://fritz.box"
+      - name: "TODO OpenVPN"
+        icon: "fas fa-wrench"
   - name: "Media"
     icon: "fas fa-photo-video"
     items:
@@ -83,14 +98,72 @@ services:
         logo: "assets/tools/jellyfin.png"
         subtitle: "Streaming / Media server"
         tag: "media"
-        url: "https://jellyfin.home/"
+        url: "https://jellyfin.home"
+        docker_host: "z2.docker.home"
+        docker_name: "jellyfin_jellyfin_1"
         target: "_blank"
-  - name: "Development"
+      - name: "Koel"
+        logo: "assets/tools/koel.png"
+        subtitle: "Music streaming server"
+        tag: "media"
+        url: "#"
+        docker_host: "z2.docker.home"
+        docker_name: "koel"
+        #target: "_blank"
+  - name: "Cloud"
+    icon: "fas fa-cloud"
+    items:
+      - name: "Nextcloud"
+        logo: "assets/tools/nextcloud.png"
+        subtitle: "Cloudy today"
+        tag: "cloud"
+        url: "https://cloud.home"
+        docker_host: "z2.docker.home"
+        docker_name: "nextcloud_app_1"
+        target: "_blank"
+  - name: "Downloads"
+    icon: "fas fa-download"
+    items:
+      - name: "Deemix"
+        logo: "assets/tools/deemix.png"
+        subtitle: "Deezer / Spotify Downloader"
+        tag: "dl"
+        url: "https://deemix.dl.home"
+        docker_host: "z3.docker.home"
+        docker_name: "Deemix"
+        target: "_blank"
+      - name: "TODO Jdownloader / pyload"
+        icon: "fas fa-wrench"
+  - name: "DevOps"
     icon: "fas fa-code"
     items:
       - name: "Gitea"
         logo: "assets/tools/gitea.png"
         tag: "dev"
-        url: "https://gitea.home/"
+        url: "https://gitea.home"
+        token: "3bf0ca42d1377d1665aecd1e693a4571b666b2cb"
+        docker_host: "z1.docker.home"
+        docker_name: "lynxl"
         type: "Gitea"
+        target: "_blank"
+      - name: "Drone"
+        logo: "assets/tools/drone.png"
+        subtitle: "CI/CD"
+        tag: "dev"
+        url: "https://drone.home"
+        target: "_blank"
+      - name: "Docker Registry"
+        logo: "assets/tools/docker.png"
+        subtitle: "Hosting of own Docker images"
+        tag: "dev"
+        url: "https://registry.docker.home"
+        target: "_blank"
+  - name: "Server"
+    icon: "fas fa-server"
+    items:
+      - name: "PVE"
+        logo: "assets/tools/proxmox.png"
+        subtitle: "Proxmox Virtual Environment"
+        tag: "srv"
+        url: "https://pve.home:8006"
         target: "_blank"
