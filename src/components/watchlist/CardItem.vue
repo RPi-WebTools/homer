@@ -10,6 +10,12 @@
                 <div class="media-left">
                     <p v-if="lang == '🇩🇪'">🇩🇪</p>
                     <p v-else>🇬🇧</p>
+                    <span v-if="type == 'tv'" class="icon is-small subtitle">
+                        <i class="fas fa-tv"></i>
+                    </span>
+                    <span v-else-if="type == 'movie'" class="icon is-small subtitle">
+                        <i class="fas fa-film"></i>
+                    </span>
                 </div>
                 <div class="media-content">
                     <p class="title is-4">{{ title }}</p>
@@ -36,6 +42,7 @@ export default {
     name: "CardItem",
     props: {
         lang: String,
+        type: String,
         title: String,
         subtitle: String,
         imdbId: String,
@@ -51,15 +58,15 @@ export default {
             window.open("https://imdb.com/title/" + this.imdbId, "_blank")
         },
         onClickLeft() {
-            this.$emit('move-left', this.title, this.col);
-            this.column = this.getNextCol(this.col, 0)
+            this.$emit('move-left', this.title, this.column, this.subtitle);
+            this.column = this.getNextCol(this.column, 0);
         },
         onClickRight() {
-            this.$emit('move-right', this.title, this.col);
-            this.column = this.getNextCol(this.col, 1)
+            this.$emit('move-right', this.title, this.column, this.subtitle);
+            this.column = this.getNextCol(this.column, 1);
         },
         remove() {
-            this.$emit('destroy-card', this.col);
+            this.$emit('destroy-card', this.title, this.column, this.subtitle);
         },
         getNextCol(cur, dir) {
             let col;

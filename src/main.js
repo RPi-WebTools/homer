@@ -6,6 +6,9 @@ import "@fortawesome/fontawesome-free/css/all.css";
 
 import "./assets/app.scss";
 
+import api from "./api";
+Vue.prototype.$http = api;
+
 Vue.config.productionTip = false;
 
 Vue.component("DynamicStyle", {

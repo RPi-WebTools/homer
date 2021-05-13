@@ -104,6 +104,7 @@
 <script>
 import Vue from 'vue'
 import CardItem from "./CardItem.vue"
+import api from "./../../api";
 
 export default {
     name: "Kanban",
@@ -118,6 +119,56 @@ export default {
             modalLangSelect: '🇬🇧',
             modalColSelect: 'todo'
         };
+    },
+    mounted() {
+        api.get('/unsure/movies').then(movies => {
+            movies.data.forEach(element => {
+                console.log(element);
+                this.createCardArg(element.title, element.subtitle, element.imdbId, element.lang, element.currentCol);
+            });
+        });
+        api.get('/todo/movies').then(movies => {
+            movies.data.forEach(element => {
+                console.log(element);
+                this.createCardArg(element.title, element.subtitle, element.imdbId, element.lang, element.currentCol);
+            });
+        });
+        api.get('/ready/movies').then(movies => {
+            movies.data.forEach(element => {
+                console.log(element);
+                this.createCardArg(element.title, element.subtitle, element.imdbId, element.lang, element.currentCol);
+            });
+        });
+        api.get('/done/movies').then(movies => {
+            movies.data.forEach(element => {
+                console.log(element);
+                this.createCardArg(element.title, element.subtitle, element.imdbId, element.lang, element.currentCol);
+            });
+        });
+        api.get('/unsure/tv').then(movies => {
+            movies.data.forEach(element => {
+                console.log(element);
+                this.createCardArg(element.title, element.subtitle, element.imdbId, element.lang, element.currentCol);
+            });
+        });
+        api.get('/todo/tv').then(movies => {
+            movies.data.forEach(element => {
+                console.log(element);
+                this.createCardArg(element.title, element.subtitle, element.imdbId, element.lang, element.currentCol);
+            });
+        });
+        api.get('/ready/tv').then(movies => {
+            movies.data.forEach(element => {
+                console.log(element);
+                this.createCardArg(element.title, element.subtitle, element.imdbId, element.lang, element.currentCol);
+            });
+        });
+        api.get('/done/tv').then(movies => {
+            movies.data.forEach(element => {
+                console.log(element);
+                this.createCardArg(element.title, element.subtitle, element.imdbId, element.lang, element.currentCol);
+            });
+        });
     },
     methods: {
         openModal() {
@@ -168,6 +219,20 @@ export default {
             }
             return col;
         },
+        getColName(col) {
+            switch (col) {
+                case this.$refs.col_unsure:
+                    return "unsure";
+                case this.$refs.col_todo:
+                    return "todo";
+                case this.$refs.col_ready:
+                    return "ready";
+                case this.$refs.col_done:
+                    return "done";
+                default:
+                    return null;
+            }
+        },
         createCard() {
             this.modalTitleInput == '' ? document.getElementById('inputTitle').classList.add('is-danger') :
                                          document.getElementById('inputTitle').classList.remove('is-danger');
@@ -177,43 +242,118 @@ export default {
                 return;
             }
 
+            this.createCardArg(this.modalTitleInput, this.modalSubtitleInput, this.modalImdbInput, this.modalLangSelect, this.modalColSelect);
+            if (this.modalSubtitleInput.includes('S')) {
+                api.put('/tv', {
+                    "title": this.modalTitleInput,
+                    "subtitle": this.modalSubtitleInput,
+                    "imdbId": this.modalImdbInput,
+                    "lang": this.modalLangSelect,
+                    "col": this.modalColSelect
+                });
+            }
+            else {
+                api.put('/movie', {
+                    "title": this.modalTitleInput,
+                    "subtitle": this.modalSubtitleInput,
+                    "imdbId": this.modalImdbInput,
+                    "lang": this.modalLangSelect,
+                    "col": this.modalColSelect
+                });
+            }
+
+            this.closeModal();
+            this.modalTitleInput = '';
+            this.modalSubtitleInput = '';
+            this.modalImdbInput = '';
+        },
+        createCardArg(modalTitleInput, modalSubtitleInput, modalImdbInput, modalLangSelect, modalColSelect) {
+            if (modalColSelect == '' || modalTitleInput == '' || modalSubtitleInput == '') {
+                return;
+            }
+            let type = 'movie';
+            if (modalSubtitleInput.includes('S')) {
+                type = 'tv';
+            }
+
             let CompCls = Vue.extend(CardItem);
             let cardInstance = new CompCls({
                 propsData: {
-                    lang: this.modalLangSelect,
-                    title: this.modalTitleInput,
-                    subtitle: this.modalSubtitleInput,
-                    imdbId: this.modalImdbInput,
-                    col: this.modalColSelect
+                    lang: modalLangSelect,
+                    type: type,
+                    title: modalTitleInput,
+                    subtitle: modalSubtitleInput,
+                    imdbId: modalImdbInput,
+                    col: modalColSelect
                 }
             });
             cardInstance.$mount();
             cardInstance.$el.classList.add('mb-3');
 
-            cardInstance.$on('move-left', (title, col) => {
+            cardInstance.$on('move-left', (title, col, subtitle) => {
                 console.log(title + ' left from ' + col);
                 let c = this.getNextCol(col, 0);
                 c.appendChild(cardInstance.$el);
+                if (subtitle.includes('S')) {
+                    api.patch('/tv', {
+                        "title": title,
+                        "subtitle": subtitle,
+                        "newCol": this.getColName(c)
+                    });
+                }
+                else {
+                    api.patch('/movie', {
+                        "title": title,
+                        "subtitle": subtitle,
+                        "newCol": this.getColName(c)
+                    });
+                }
             });
-            cardInstance.$on('move-right', (title, col) => {
+            cardInstance.$on('move-right', (title, col, subtitle) => {
                 console.log(title + ' right from ' + col);
                 let c = this.getNextCol(col, 1);
                 c.appendChild(cardInstance.$el);
+                if (subtitle.includes('S')) {
+                    api.patch('/tv', {
+                        "title": title,
+                        "subtitle": subtitle,
+                        "newCol": this.getColName(c)
+                    });
+                }
+                else {
+                    api.patch('/movie', {
+                        "title": title,
+                        "subtitle": subtitle,
+                        "newCol": this.getColName(c)
+                    });
+                }
             });
-            cardInstance.$on('destroy-card', col => {
+            cardInstance.$on('destroy-card', (title, col, subtitle) => {
                 console.log('destroy in ' + col);
                 let c = this.getCurrentCol(col);
                 c.removeChild(cardInstance.$el);
                 cardInstance.$destroy();
+                if (subtitle.includes('S')) {
+                    api.delete('/tv', {
+                        data: {
+                            "title": title,
+                            "subtitle": subtitle
+                        }
+                    });
+                }
+                else {
+                    api.delete('/movie', {
+                        data: {
+                            "title": title,
+                            "subtitle": subtitle
+                        }
+                    });
+                }
             });
 
-            let col = this.getCurrentCol(this.modalColSelect);
+            let col = this.getCurrentCol(modalColSelect);
             if (col != null) {
                 col.appendChild(cardInstance.$el);
-                this.closeModal();
-                this.modalTitleInput = '';
-                this.modalSubtitleInput = '';
-                this.modalImdbInput = '';
             }
         }
     }
@@ -249,7 +389,7 @@ export default {
     grid-column-gap: 20px;
     grid-template-columns: 25% 25% 25% 25%;
     grid-template-areas: "header1 header1 header1 header2"
-                         " main1 main2 main3 main4";
+                         "main1 main2 main3 main4";
 }
 .grid-item-top-1 {
     grid-area: header1;

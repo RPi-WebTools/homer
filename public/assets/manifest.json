@@ -1,7 +1,7 @@
 {
-  "name": "Homer Dashboard",
-  "short_name": "Homer",
-  "theme_color": "#3367D6",
+  "name": "Lynxl Dashboard",
+  "short_name": "Lynxl",
+  "theme_color": "#838a9b",
   "start_url": "../",
   "icons": [
     {
