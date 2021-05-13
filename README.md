@@ -1,3 +1,4 @@
+[![Build Status](https://drone.home/api/badges/RPi-WebTools/homer/status.svg?ref=refs/heads/lynxl)](https://drone.home/RPi-WebTools/homer)
 <h1 align="center">
 	<img
 		width="180"
