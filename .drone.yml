@@ -6,14 +6,22 @@ steps:
   - name: default-build
     image: node:lts-alpine
     commands:
-      - ls
       - yarn install
       - yarn build
-  - name: docker-build
+  - name: docker-amd64
     image: plugins/docker
     settings:
       registry: registry.docker.home:5000
       repo: registry.docker.home:5000/rpi-webtools/lynxl
       auto_tag: true
-      auto_tag_suffix: linux_amd64
+      auto_tag_suffix: amd64
+      insecure: true
+  - name: docker-arm32v7
+    image: plugins/docker
+    settings:
+      registry: registry.docker.home:5000
+      repo: registry.docker.home:5000/rpi-webtools/lynxl
+      dockerfile: Dockerfile.arm32v7
+      auto_tag: true
+      auto_tag_suffix: arm32v7
       insecure: true
