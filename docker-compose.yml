@@ -1,8 +1,8 @@
 ---
 version: "2"
 services:
-  homer:
-    image: rpi-webtools/lynxl
+  lynxl:
+    image: registry.docker.home:5000/rpi-webtools/lynxl
     #To build from source, comment previous line and uncomment below
     #build: .
     container_name: lynxl
@@ -13,4 +13,12 @@ services:
     environment:
       - UID=1000
       - GID=1000
-    restart: unless-stopped
+    restart: always
+  lynxl-backend:
+    image: registry.docker.home:5000/rpi-webtools/lynxl-wl-backend
+    container_name: lynxl-backend
+    volumes:
+      - './db:/app/db'
+    ports:
+      - 3000:3000
+    restart: always
