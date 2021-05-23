@@ -11,5 +11,6 @@ module.exports = {
     "no-console": "off",
     "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off",
     "vue/require-v-for-key": "off",
+    "prettier/prettier": 0,
   },
 };
