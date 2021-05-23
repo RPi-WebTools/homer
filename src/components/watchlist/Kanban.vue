@@ -7,7 +7,7 @@
                         <h3 class="title is-3 level-item">Backlog</h3>
                     </div>
                     <div class="level-right">
-                        <button class="button level-item" id="add-btn" @click="openModal()">
+                        <button class="button level-item" id="add-btn" @click="openModal('add-modal')">
                             <span class="icon is-small">
                                 <i class="fas fa-plus"></i>
                             </span>
@@ -45,7 +45,7 @@
             <div class="modal-card">
                 <header class="modal-card-head">
                     <p class="modal-card-title">Add Card</p>
-                    <button class="delete" aria-label="close" @click="closeModal()"></button>
+                    <button class="delete" aria-label="close" @click="closeModal('add-modal')"></button>
                 </header>
                 <section class="modal-card-body">
                     <div class="field">
@@ -93,7 +93,23 @@
                 </section>
                 <footer class="modal-card-foot">
                     <button type="submit" class="button is-success" @click="createCard()">Confirm</button>
-                    <button class="button" @click="closeModal()">Cancel</button>
+                    <button class="button" @click="closeModal('add-modal')">Cancel</button>
+                </footer>
+            </div>
+        </div>
+        <div class="modal" id="del-modal">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">Delete Card</p>
+                    <button class="delete" aria-label="close" @click="closeModal('del-modal')"></button>
+                </header>
+                <section class="modal-card-body">
+                    <p class="has-text-black">Do you really want to delete this card?</p>
+                </section>
+                <footer class="modal-card-foot">
+                    <button type="submit" class="button is-danger" @click="confirmDelete()">Confirm</button>
+                    <button class="button" @click="closeModal('del-modal')">Cancel</button>
                 </footer>
             </div>
         </div>
@@ -117,65 +133,71 @@ export default {
             modalSubtitleInput: '',
             modalImdbInput: '',
             modalLangSelect: '🇬🇧',
-            modalColSelect: 'todo'
+            modalColSelect: 'todo',
+            delModalConfirmed: false,
+            delModalCol: null,
+            delModalCardInstance: null,
+            delModalTitle: '',
+            delModalSubtitle: ''
         };
     },
     mounted() {
+        let unsure = [];
         api.get('/unsure/movies').then(movies => {
-            movies.data.forEach(element => {
-                console.log(element);
-                this.createCardArg(element.title, element.subtitle, element.imdbId, element.lang, element.currentCol);
+            unsure = movies.data;
+            api.get('/unsure/tv').then(shows => {
+                unsure.push(...shows.data);
+                unsure.sort((a, b) => a.title.localeCompare(b.title));
+                unsure.forEach(element => {
+                    this.createCardArg(element.title, element.subtitle, element.imdbId, element.lang, element.currentCol);
+                });
             });
         });
+        let todo = [];
         api.get('/todo/movies').then(movies => {
-            movies.data.forEach(element => {
-                console.log(element);
-                this.createCardArg(element.title, element.subtitle, element.imdbId, element.lang, element.currentCol);
+            todo = movies.data;
+            api.get('/todo/tv').then(shows => {
+                todo.push(...shows.data);
+                todo.sort((a, b) => a.title.localeCompare(b.title));
+                todo.forEach(element => {
+                    this.createCardArg(element.title, element.subtitle, element.imdbId, element.lang, element.currentCol);
+                });
             });
         });
+        let ready = [];
         api.get('/ready/movies').then(movies => {
-            movies.data.forEach(element => {
-                console.log(element);
-                this.createCardArg(element.title, element.subtitle, element.imdbId, element.lang, element.currentCol);
+            ready = movies.data;
+            api.get('/ready/tv').then(shows => {
+                ready.push(...shows.data);
+                ready.sort((a, b) => a.title.localeCompare(b.title));
+                ready.forEach(element => {
+                    this.createCardArg(element.title, element.subtitle, element.imdbId, element.lang, element.currentCol);
+                });
             });
         });
+        let done = [];
         api.get('/done/movies').then(movies => {
-            movies.data.forEach(element => {
-                console.log(element);
-                this.createCardArg(element.title, element.subtitle, element.imdbId, element.lang, element.currentCol);
-            });
-        });
-        api.get('/unsure/tv').then(movies => {
-            movies.data.forEach(element => {
-                console.log(element);
-                this.createCardArg(element.title, element.subtitle, element.imdbId, element.lang, element.currentCol);
-            });
-        });
-        api.get('/todo/tv').then(movies => {
-            movies.data.forEach(element => {
-                console.log(element);
-                this.createCardArg(element.title, element.subtitle, element.imdbId, element.lang, element.currentCol);
-            });
-        });
-        api.get('/ready/tv').then(movies => {
-            movies.data.forEach(element => {
-                console.log(element);
-                this.createCardArg(element.title, element.subtitle, element.imdbId, element.lang, element.currentCol);
-            });
-        });
-        api.get('/done/tv').then(movies => {
-            movies.data.forEach(element => {
-                console.log(element);
-                this.createCardArg(element.title, element.subtitle, element.imdbId, element.lang, element.currentCol);
+            done = movies.data;
+            api.get('/done/tv').then(shows => {
+                done.push(...shows.data);
+                done.sort((a, b) => a.title.localeCompare(b.title));
+                done.forEach(element => {
+                    this.createCardArg(element.title, element.subtitle, element.imdbId, element.lang, element.currentCol);
+                });
             });
         });
     },
     methods: {
-        openModal() {
-            document.getElementById("add-modal").classList.add("is-active");
+        openModal(id) {
+            document.getElementById(id).classList.add("is-active");
         },
-        closeModal() {
-            document.getElementById("add-modal").classList.remove("is-active");
+        closeModal(id) {
+            document.getElementById(id).classList.remove("is-active");
+        },
+        confirmDelete() {
+            this.delModalConfirmed = true;
+            this.deleteCard();
+            this.closeModal('del-modal');
         },
         getCurrentCol(name) {
             let col;
@@ -262,7 +284,7 @@ export default {
                 });
             }
 
-            this.closeModal();
+            this.closeModal('add-modal');
             this.modalTitleInput = '';
             this.modalSubtitleInput = '';
             this.modalImdbInput = '';
@@ -329,31 +351,47 @@ export default {
                 }
             });
             cardInstance.$on('destroy-card', (title, col, subtitle) => {
-                console.log('destroy in ' + col);
-                let c = this.getCurrentCol(col);
-                c.removeChild(cardInstance.$el);
-                cardInstance.$destroy();
-                if (subtitle.includes('S')) {
+                this.openModal('del-modal');
+                this.delModalConfirmed = false;
+                this.delModalCol = col;
+                this.delModalCardInstance = cardInstance;
+                this.delModalTitle = title;
+                this.delModalSubtitle = subtitle;
+            });
+
+            let col = this.getCurrentCol(modalColSelect);
+            if (col != null) {
+                col.appendChild(cardInstance.$el);
+            }
+        },
+        deleteCard() {
+            if (this.delModalConfirmed && this.delModalCol != null && this.delModalCardInstance != null && this.delModalTitle != '' && this.delModalSubtitle != '') {
+                console.log('destroy in ' + this.delModalCol);
+                let c = this.getCurrentCol(this.delModalCol);
+                c.removeChild(this.delModalCardInstance.$el);
+                this.delModalCardInstance.$destroy();
+                if (this.delModalSubtitle.includes('S')) {
                     api.delete('/tv', {
                         data: {
-                            "title": title,
-                            "subtitle": subtitle
+                            "title": this.delModalTitle,
+                            "subtitle": this.delModalSubtitle
                         }
                     });
                 }
                 else {
                     api.delete('/movie', {
                         data: {
-                            "title": title,
-                            "subtitle": subtitle
+                            "title": this.delModalTitle,
+                            "subtitle": this.delModalSubtitle
                         }
                     });
                 }
-            });
 
-            let col = this.getCurrentCol(modalColSelect);
-            if (col != null) {
-                col.appendChild(cardInstance.$el);
+                this.delModalConfirmed = false;
+                this.delModalCol = null;
+                this.delModalCardInstance = null;
+                this.delModalTitle = '';
+                this.delModalSubtitle = '';
             }
         }
     }
