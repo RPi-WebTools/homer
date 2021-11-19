@@ -61,48 +61,54 @@
             <!-- Optional messages -->
             <Message :item="config.message" />
 
-          <!-- Horizontal layout -->
-          <div v-if="!vlayout || filter" class="columns is-multiline">
-            <template v-for="group in services">
-              <h2 v-if="group.name" class="column is-full group-title">
-                <i v-if="group.icon" :class="['fa-fw', group.icon]"></i>
-                <div v-else-if="group.logo" class="group-logo media-left">
-                  <figure class="image is-48x48">
-                    <img :src="group.logo" :alt="`${group.name} logo`" />
-                  </figure>
-                </div>
-                {{ group.name }}
-              </h2>
-              <Service
-                v-for="(item, index) in group.items"
-                :key="group.name + index"
-                :item="item"
-                :proxy="config.proxy"
-                :class="['column', `is-${12 / config.columns}`]"
-              />
-            </template>
-          </div>
+            <!-- Horizontal layout -->
+            <div v-if="!vlayout || filter" class="columns is-multiline">
+              <template v-for="group in services">
+                <h2 v-if="group.name" class="column is-full group-title">
+                  <i v-if="group.icon" :class="['fa-fw', group.icon]"></i>
+                  <div v-else-if="group.logo" class="group-logo media-left">
+                    <figure class="image is-48x48">
+                      <img :src="group.logo" :alt="`${group.name} logo`" />
+                    </figure>
+                  </div>
+                  {{ group.name }}
+                </h2>
+                <Service
+                  v-for="(item, index) in group.items"
+                  :key="group.name + index"
+                  :item="item"
+                  :proxy="config.proxy"
+                  :class="['column', `is-${12 / config.columns}`]"
+                />
+              </template>
+            </div>
 
             <!-- Vertical layout -->
             <div
               v-if="!filter && vlayout"
               class="columns is-multiline layout-vertical"
             >
-              <h2 v-if="group.name" class="group-title">
-                <i v-if="group.icon" :class="['fa-fw', group.icon]"></i>
-                <div v-else-if="group.logo" class="group-logo media-left">
-                  <figure class="image is-48x48">
-                    <img :src="group.logo" :alt="`${group.name} logo`" />
-                  </figure>
-                </div>
-                {{ group.name }}
-              </h2>
-              <Service
-                v-for="(item, index) in group.items"
-                :key="group.name + index"
-                :item="item"
-                :proxy="config.proxy"
-              />
+              <div
+                  :class="['column', `is-${12 / config.columns}`]"
+                  v-for="group in services"
+                  :key="group.name"
+                >
+                <h2 v-if="group.name" class="group-title">
+                  <i v-if="group.icon" :class="['fa-fw', group.icon]"></i>
+                  <div v-else-if="group.logo" class="group-logo media-left">
+                    <figure class="image is-48x48">
+                      <img :src="group.logo" :alt="`${group.name} logo`" />
+                    </figure>
+                  </div>
+                  {{ group.name }}
+                </h2>
+                <Service
+                  v-for="(item, index) in group.items"
+                  :key="group.name + index"
+                  :item="item"
+                  :proxy="config.proxy"
+                />
+              </div>
             </div>
           </div>
           <div v-else>
