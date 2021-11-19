@@ -21,11 +21,10 @@
                   {{ item.subtitle }}
                 </template>
                 <template v-else-if="api">
-                  {{ percentage }}&percnt; blocked
+                  happily storing {{ api.count }} documents
                 </template>
               </p>
             </div>
-            <ServiceHeartbeat v-if="item.docker_host && item.docker_name" v-bind:item="item" />
           </div>
           <div class="tag" :class="item.tagstyle" v-if="item.tag">
             <strong class="tag-text">#{{ item.tag }}</strong>
@@ -37,40 +36,41 @@
 </template>
 
 <script>
-import ServiceHeartbeat from "../ServiceHeartbeat.vue";
-
 export default {
-  name: "PiHole",
-  components: {
-    ServiceHeartbeat
-  },
+  name: "Paperless",
   props: {
     item: Object,
   },
   data: () => ({
-    api: {
-      status: "",
-      ads_percentage_today: 0,
-    },
+    api: null,
   }),
-  computed: {
-    percentage: function () {
-      if (this.api) {
-        return this.api.ads_percentage_today.toFixed(1);
-      }
-      return "";
-    },
-  },
   created() {
     this.fetchStatus();
   },
   methods: {
     fetchStatus: async function () {
-      const url = `${this.item.url}/api.php`;
+      if (this.item.subtitle != null) return; // omitting unnecessary ajax call as the subtitle is showing
+      var apikey = this.item.apikey;
+      if (!apikey) {
+        console.error(
+          "apikey is not present in config.yml for the paperless entry!"
+        );
+        return;
+      }
+      const url = `${this.item.url}/api/documents/`;
       this.api = await fetch(url, {
         credentials: "include",
+        headers: {
+          Authorization: "Token " + this.item.apikey,
+        },
       })
-        .then((response) => response.json())
+        .then(function (response) {
+          if (!response.ok) {
+            throw new Error("Not 2xx response");
+          } else {
+            return response.json();
+          }
+        })
         .catch((e) => console.log(e));
     },
   },

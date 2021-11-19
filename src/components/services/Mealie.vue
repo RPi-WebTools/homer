@@ -20,12 +20,12 @@
                 <template v-if="item.subtitle">
                   {{ item.subtitle }}
                 </template>
-                <template v-else-if="api">
-                  {{ percentage }}&percnt; blocked
+                <template v-else-if="meal"> Today: {{ meal.name }} </template>
+                <template v-else-if="stats">
+                  happily keeping {{ stats.totalRecipes }} recipes organized
                 </template>
               </p>
             </div>
-            <ServiceHeartbeat v-if="item.docker_host && item.docker_name" v-bind:item="item" />
           </div>
           <div class="tag" :class="item.tagstyle" v-if="item.tag">
             <strong class="tag-text">#{{ item.tag }}</strong>
@@ -37,40 +37,50 @@
 </template>
 
 <script>
-import ServiceHeartbeat from "../ServiceHeartbeat.vue";
-
 export default {
-  name: "PiHole",
-  components: {
-    ServiceHeartbeat
-  },
+  name: "Mealie",
   props: {
     item: Object,
   },
   data: () => ({
-    api: {
-      status: "",
-      ads_percentage_today: 0,
-    },
+    stats: null,
+    meal: null,
   }),
-  computed: {
-    percentage: function () {
-      if (this.api) {
-        return this.api.ads_percentage_today.toFixed(1);
-      }
-      return "";
-    },
-  },
   created() {
     this.fetchStatus();
   },
   methods: {
     fetchStatus: async function () {
-      const url = `${this.item.url}/api.php`;
-      this.api = await fetch(url, {
-        credentials: "include",
+      if (this.item.subtitle != null) return; // omitting unnecessary ajax call as the subtitle is showing
+      this.meal = await fetch(`${this.item.url}/api/meal-plans/today/`, {
+        headers: {
+          Authorization: "Bearer " + this.item.apikey,
+          Accept: "application/json",
+        },
       })
-        .then((response) => response.json())
+        .then(function (response) {
+          if (!response.ok) {
+            throw new Error("Not 2xx response");
+          } else {
+            if (response != null) {
+              return response.json();
+            }
+          }
+        })
+        .catch((e) => console.log(e));
+      this.stats = await fetch(`${this.item.url}/api/debug/statistics/`, {
+        headers: {
+          Authorization: "Bearer " + this.item.apikey,
+          Accept: "application/json",
+        },
+      })
+        .then(function (response) {
+          if (!response.ok) {
+            throw new Error("Not 2xx response");
+          } else {
+            return response.json();
+          }
+        })
         .catch((e) => console.log(e));
     },
   },
