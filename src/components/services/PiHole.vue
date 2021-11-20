@@ -59,16 +59,13 @@ export default {
       const url = `${this.item.url}/api.php`;
       this.api = await fetch(url)
         .then((response) => response.json())
-        .catch((e) => console.log(e));
+        .catch((e) => console.error(e));
     },
   },
 };
 </script>
 
 <style scoped lang="scss">
-.media-left img {
-  max-height: 100%;
-}
 .heartbeat.enabled:before {
   background-color: #94e185;
   border-color: #78d965;
