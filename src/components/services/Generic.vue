@@ -28,8 +28,11 @@
               </p>
               </slot>
             </div>
-            <ServiceHeartbeat v-if="item.docker_host && item.docker_name" v-bind:item="item" />
-            <slot name="indicator" class="indicator"></slot>
+            <slot name="indicator" class="indicator">
+              <div class="heartbeat" :class="dockerHeartbeat" v-if="item.docker_host && item.docker_name">
+                {{ dockerHeartbeat | upperCase }}
+              </div>
+            </slot>
           </div>
           <div class="tag" :class="item.tagstyle" v-if="item.tag">
             <strong class="tag-text">#{{ item.tag }}</strong>
@@ -41,19 +44,57 @@
 </template>
 
 <script>
-import ServiceHeartbeat from "../ServiceHeartbeat.vue";
+import service from "@/mixins/service.js";
 
 export default {
   name: "Generic",
-  components: {
-    ServiceHeartbeat
-  },
+  mixins: [service],
   props: {
     item: Object,
+  },
+  data: () => ({
+    dockerHeartbeat: 'offline'
+  }),
+  created: function () {
+    if (this.item.docker_host && this.item.docker_name) {
+      let that = this;
+      this.checkOffline();
+
+      document.addEventListener(
+        "visibilitychange",
+        function () {
+          if (document.visibilityState == "visible") {
+            that.checkOffline();
+          }
+        },
+        false
+      );
+    }
   },
   computed: {
     mediaClass: function () {
       return { media: true, "no-subtitle": !this.item.subtitle };
+    },
+  },
+  methods: {
+    checkOffline: function () {
+      let that = this;
+      return fetch("https://" + this.item.docker_host + "/containers/" + this.item.docker_name + "/json")
+        .then((response) => response.json())
+        .then(function (data) {
+          if (data.State.Running) {
+            that.dockerHeartbeat = 'online';
+          }
+          else {
+            that.dockerHeartbeat = 'offline';
+          }
+        })
+        .catch(function () {
+          that.dockerHeartbeat = 'offline';
+        })
+        .finally(function () {
+          that.$emit("network-status-update", that.dockerHeartbeat);
+        });
     },
   },
 };
@@ -68,6 +109,39 @@ export default {
 
   img {
     max-height: 100%;
+  }
+}
+.heartbeat {
+  font-size: 0.8rem;
+  color: var(--text-title);
+  align-self: flex-start;
+
+  &.online:before, %online-before {
+    background-color: #94e185;
+    border-color: #78d965;
+    box-shadow: 0 0 4px 1px #94e185;
+  }
+
+  &.offline:before {
+    background-color: #c9404d;
+    border-color: #c42c3b;
+    box-shadow: 0 0 4px 1px #c9404d;
+  }
+
+  &.unknown:before {
+    background-color: #c9c740;
+    border-color: #ccc935;
+    box-shadow: 0px 0px 4px 1px #c9c740;
+  }
+
+  &:before {
+    content: " ";
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin-right: 10px;
+    border: 1px solid #000;
+    border-radius: 10px;
   }
 }
 </style>

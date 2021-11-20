@@ -1,48 +1,33 @@
 <template>
-  <div>
-    <div class="card" :class="item.class">
-      <a :href="item.url" :target="item.target" rel="noreferrer">
-        <div class="card-content">
-          <div class="media">
-            <div v-if="item.logo" class="media-left">
-              <figure class="image is-48x48">
-                <img :src="item.logo" :alt="`${item.name} logo`" />
-              </figure>
-            </div>
-            <div v-if="item.icon" class="media-left">
-              <figure class="image is-48x48">
-                <i style="font-size: 35px" :class="['fa-fw', item.icon]"></i>
-              </figure>
-            </div>
-            <div class="media-content">
-              <p class="title is-4">{{ item.name }}</p>
-              <p class="subtitle is-6">
-                <template v-if="item.subtitle">
-                  {{ item.subtitle }}
-                </template>
-                <template v-else-if="api">
-                  {{ percentage }}&percnt; blocked
-                </template>
-              </p>
-            </div>
-            <ServiceHeartbeat v-if="item.docker_host && item.docker_name" v-bind:item="item" />
-          </div>
-          <div class="tag" :class="item.tagstyle" v-if="item.tag">
-            <strong class="tag-text">#{{ item.tag }}</strong>
-          </div>
-        </div>
-      </a>
-    </div>
-  </div>
+  <Generic :item="item">
+    <template #content>
+      <p class="title is-4">{{ item.name }}</p>
+      <p class="subtitle is-6">
+        <template v-if="item.subtitle">
+          {{ item.subtitle }}
+        </template>
+        <template v-else-if="api">
+          {{ percentage }}&percnt; blocked
+        </template>
+      </p>
+    </template>
+    <template #indicator v-if="api">
+      <div class="heartbeat" :class="protection">
+        {{ protection | upperCase }}
+      </div>
+    </template>
+  </Generic>
 </template>
 
 <script>
-import ServiceHeartbeat from "../ServiceHeartbeat.vue";
+import service from "@/mixins/service.js";
+import Generic from "./Generic.vue";
 
 export default {
   name: "PiHole",
+  mixins: [service],
   components: {
-    ServiceHeartbeat
+    Generic,
   },
   props: {
     item: Object,
@@ -59,6 +44,11 @@ export default {
         return this.api.ads_percentage_today.toFixed(1);
       }
       return "";
+    },
+    protection: function () {
+      if (this.api) {
+        return this.api.status;
+      } else return "unknown";
     },
   },
   created() {
@@ -78,5 +68,15 @@ export default {
 <style scoped lang="scss">
 .media-left img {
   max-height: 100%;
+}
+.heartbeat.enabled:before {
+  background-color: #94e185;
+  border-color: #78d965;
+  box-shadow: 0 0 4px 1px #94e185;
+}
+.heartbeat.disabled:before {
+  background-color: #c69c6d;
+  border-color: #c69c6d;
+  box-shadow: 0 0 4px 1px #c69c6d;
 }
 </style>
