@@ -25,6 +25,7 @@ colors:
     text-title: "#303030"
     text-subtitle: "#424242"
     card-shadow: rgba(0, 0, 0, 0.1)
+    link: "#3273dc"
     link-hover: "#363636"
   dark:
     highlight-primary: "#838a9b"
@@ -37,6 +38,7 @@ colors:
     text-title: "#fafafa"
     text-subtitle: "#f5f5f5"
     card-shadow: rgba(0, 0, 0, 0.4)
+    link: "#3273dc"
     link-hover: "#c69c6d"
 
 # Optional message
@@ -73,7 +75,6 @@ services:
         logo: "assets/tools/unbound.png"
         subtitle: "Recursive DNS resolver"
         tag: "net"
-        url: "#"
         docker_host: "z1.docker.home"
         docker_name: "unbound"
       - name: "Statping"
@@ -136,6 +137,8 @@ services:
         url: "https://recipes.home"
         docker_host: "z2.docker.home"
         docker_name: "mealie"
+        #type: "Mealie"
+        #apikey: ""
         target: "_blank"
   - name: "Downloads"
     icon: "fas fa-download"
@@ -197,3 +200,9 @@ services:
         tag: "srv"
         url: "https://pve.home:8006"
         target: "_blank"
+      - name: "Mercury"
+        logo: "assets/tools/mercury.png"
+        subtitle: "Mail server powered by Maddy"
+        tag: "srv"
+        docker_host: "z1.docker.home"
+        docker_name: "mercury_maddy"
