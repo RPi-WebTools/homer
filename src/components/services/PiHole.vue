@@ -6,12 +6,12 @@
         <template v-if="item.subtitle">
           {{ item.subtitle }}
         </template>
-        <template v-else-if="api">
+        <template v-else-if="percentage">
           {{ percentage }}&percnt; blocked
         </template>
       </p>
     </template>
-    <template #indicator v-if="api">
+    <template #indicator>
       <div class="heartbeat" :class="protection">
         {{ protection | upperCase }}
       </div>
@@ -28,26 +28,23 @@ export default {
   mixins: [service],
   components: {
     Generic,
-  },
-  props: {
+  },  props: {
     item: Object,
   },
   data: () => ({
-    api: {
-      status: "",
-      ads_percentage_today: 0,
-    },
+    status: "",
+    ads_percentage_today: 0,
   }),
   computed: {
     percentage: function () {
-      if (this.api) {
-        return this.api.ads_percentage_today.toFixed(1);
+      if (this.ads_percentage_today) {
+        return this.ads_percentage_today.toFixed(1);
       }
       return "";
     },
     protection: function () {
-      if (this.api) {
-        return this.api.status;
+      if (this.status) {
+        return this.status;
       } else return "unknown";
     },
   },
@@ -56,11 +53,10 @@ export default {
   },
   methods: {
     fetchStatus: async function () {
-      const url = `${this.item.url}/api.php`;
-      this.api = await fetch(url)
-        .then((response) => response.json())
-        .catch((e) => console.error(e));
-    },
+      const result = await this.fetch("/api.php").catch((e) => console.error(e));
+
+      this.status = result.status;
+      this.ads_percentage_today = result.ads_percentage_today;    },
   },
 };
 </script>

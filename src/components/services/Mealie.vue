@@ -1,5 +1,5 @@
 <template>
-  <Generic :item=item>
+  <Generic :item="item">
     <template #content>
       <p class="title is-4">{{ item.name }}</p>
       <p class="subtitle is-6">
@@ -37,41 +37,20 @@ export default {
   },
   methods: {
     fetchStatus: async function () {
-      if (this.item.subtitle != null) return; // omitting unnecessary ajax call as the subtitle is showing
-      this.meal = await fetch(`${this.item.url}/api/meal-plans/today/`, {
-        headers: {
+      const headers = {
           Authorization: "Bearer " + this.item.apikey,
           Accept: "application/json",
+      };
+
+      if (this.item.subtitle != null) return;
+
+      this.meal = await this.fetch("/api/meal-plans/today/", { headers }).catch(
+        (e) => console.log(e)
+      );
+      this.stats = await this.fetch("/api/debug/statistics/", {
+        headers,
+      }).catch((e) => console.log(e));
         },
-      })
-        .then(function (response) {
-          if (!response.ok) {
-            throw new Error("Not 2xx response");
-          } else {
-            if (response != null) {
-              return response.json();
-            }
-          }
-        })
-        .catch((e) => console.error(e));
-      this.stats = await fetch(`${this.item.url}/api/debug/statistics/`, {
-        headers: {
-          Authorization: "Bearer " + this.item.apikey,
-          Accept: "application/json",
         },
-      })
-        .then(function (response) {
-          if (!response.ok) {
-            throw new Error("Not 2xx response");
-          } else {
-            return response.json();
-          }
-        })
-        .catch((e) => console.error(e));
-    },
-  },
 };
 </script>
-
-<style scoped lang="scss">
-</style>

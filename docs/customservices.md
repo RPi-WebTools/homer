@@ -1,7 +1,11 @@
 # Custom Services
 
 Some service can use a specific a component that provides some extra features by adding a `type` key to the service yaml
-configuration. Available services are in `src/components/`. Here is an overview of all custom services that are available
+configuration and, where applicable, an apikey. Note that config.yml is exposed at /assets/config.yml via HTTP and any
+apikey included in the configuration file is exposed to anyone who can access the homer instance. Only include an apikey
+if your homer instance is secured behind some form of authentication or access restriction.
+
+Available services are in `src/components/`. Here is an overview of all custom services that are available
 within Homer.
 
 If you experiencing any issue, please have a look to the [troubleshooting](troubleshooting.md) page.
@@ -17,8 +21,6 @@ If you experiencing any issue, please have a look to the [troubleshooting](troub
   useCredentials: false # Optional: Override global proxy.useCredentials configuration.
   type: "<type>"
 ```
-
-⚠️🚧 `endpoint` & `useCredentials` new options are not yet supported by all custom services (but will be very soon).
 
 ## PiHole
 
@@ -65,18 +67,28 @@ Two lines are needed in the config.yml :
 The url must be the root url of Medusa application.
 The Medusa API key can be found in General configuration > Interface. It is needed to access Medusa API.
 
-## Sonarr/Radarr
+## Lidarr, Prowlarr, Sonarr and Radarr
 
-This service displays Activity (blue), Warning (orange) or Error (red) notifications bubbles from the Radarr/Sonarr application.
+This service displays Activity (blue), Warning (orange) or Error (red) notifications bubbles from the Lidarr, Radarr or Sonarr application.
 Two lines are needed in the config.yml :
 
 ```yaml
-  type: "Radarr" or "Sonarr"
+  type: "Lidarr", "Prowlarr", "Radarr" or "Sonarr"
   apikey: "01234deb70424befb1f4ef6a23456789"
 ```
 
-The url must be the root url of Radarr/Sonarr application.
-The Radarr/Sonarr API key can be found in Settings > General. It is needed to access the API.
+The url must be the root url of Lidarr, Prowlarr, Radarr or Sonarr application.
+The Lidarr, Prowlarr, Radarr or Sonarr API key can be found in Settings > General. It is needed to access the API.
+If you are using an older version of Radarr or Sonarr which don't support the new V3 api endpoints, add the following line to your service config "legacyApi: true", example: 
+
+```yaml
+- name: "Radarr"
+  type: "Radarr"
+  url: "http://localhost:7878/"
+  apikey: "MY-SUPER-SECRET-API-KEY"
+  target: "_blank"
+  legacyApi: true
+```
 
 ## PaperlessNG
 
@@ -112,4 +124,20 @@ For Prometheus you need to set the type to Prometheus and provide a url.
   logo: "assets/tools/sample.png"
   url: "http://192.168.0.151/"
   # subtitle: "Monitor data server"
+```
+
+## Portainer
+
+This service displays info about the total number of containers managed by your Portainer instance.
+In order to use it, you must be using Portainer version 1.11 or later. Generate an access token from the UI and pass
+it to the apikey field.
+
+See https://docs.portainer.io/v/ce-2.11/user/account-settings#access-tokens
+
+```yaml
+- name: "Portainer"
+  logo: "assets/tools/sample.png"
+  url: "http://192.168.0.151/"
+  type: "Portainer"
+  apikey: "MY-SUPER-SECRET-API-KEY"
 ```
