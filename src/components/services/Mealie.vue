@@ -18,10 +18,12 @@
 </template>
 
 <script>
+import service from "@/mixins/service.js";
 import Generic from "./Generic.vue";
 
 export default {
   name: "Mealie",
+  mixins: [service],
   components: {
     Generic,
   },
