@@ -28,9 +28,9 @@
               </p>
               </slot>
             </div>
-            <slot name="indicator" class="indicator">
-              <div class="heartbeat" :class="dockerHeartbeat" v-if="item.docker_host && item.docker_name">
-                {{ dockerHeartbeat | upperCase }}
+            <slot name="indicator" class="indicator" v-if="!item.heartbeat_ignore">
+              <div class="heartbeat" :class="heartbeat">
+                {{ heartbeat | upperCase }}
               </div>
             </slot>
           </div>
@@ -53,10 +53,10 @@ export default {
     item: Object,
   },
   data: () => ({
-    dockerHeartbeat: 'offline'
+    heartbeat: 'unknown'
   }),
   created: function () {
-    if (this.item.docker_host && this.item.docker_name) {
+    if ((!this.item.heartbeat_ignore && this.item.url && this.item.url != '') || (this.item.docker_host && this.item.docker_name)) {
       let that = this;
       this.checkOffline();
 
@@ -79,21 +79,43 @@ export default {
   methods: {
     checkOffline: function () {
       let that = this;
-      return fetch("https://" + this.item.docker_host + "/containers/" + this.item.docker_name + "/json")
-        .then((response) => response.json())
-        .then(function (data) {
-          if (data.State.Running) {
-            that.dockerHeartbeat = 'online';
+
+      if (this.item.docker_host && this.item.docker_name) {
+        return fetch("https://" + this.item.docker_host + "/containers/" + this.item.docker_name + "/json")
+          .then((response) => response.json())
+          .then(function (data) {
+            if (data.State.Running) {
+              that.heartbeat = 'online';
+            }
+            else {
+              that.heartbeat = 'offline';
+            }
+          })
+          .catch(function () {
+            that.heartbeat = 'offline';
+          })
+          .finally(function () {
+            that.$emit("network-status-update", that.heartbeat);
+          });
+      }
+
+      const abortCtrl = new AbortController();
+      setTimeout(() => abortCtrl.abort(), 2000);
+      return fetch(this.item.url, {method: 'OPTIONS', signal: abortCtrl.signal})
+        .then((response) => response.status == 200 || response.status == 204)
+        .then(function (check) {
+          if (check) {
+            that.heartbeat = 'online';
           }
           else {
-            that.dockerHeartbeat = 'offline';
+            that.heartbeat = 'offline';
           }
         })
         .catch(function () {
-          that.dockerHeartbeat = 'offline';
+          that.heartbeat = 'offline';
         })
         .finally(function () {
-          that.$emit("network-status-update", that.dockerHeartbeat);
+          that.$emit("network-status-update", that.heartbeat);
         });
     },
   },
