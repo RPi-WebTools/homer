@@ -6,7 +6,21 @@ apikey included in the configuration file is exposed to anyone who can access th
 if your homer instance is secured behind some form of authentication or access restriction.
 
 Available services are in `src/components/`. Here is an overview of all custom services that are available
-within Homer.
+within Homer:
++ [PiHole](#pihole)
++ [OpenWeatherMap](#openweathermap)
++ [Medusa](#medusa)
++ [Lidarr, Prowlarr, Sonarr and Radarr](#lidarr-prowlarr-sonarr-and-radarr)
++ [PaperlessNG](#paperlessng)
++ [Ping](#ping)
++ [Prometheus](#prometheus)
++ [AdGuard Home](#adguard-home)
++ [Portainer](#portainer)
++ [Emby / Jellyfin](#emby--jellyfin)
++ [Uptime Kuma](#uptime-kuma)
++ [Tautulli](#tautulli)
++ [Mealie](#mealie)
++ [Healthchecks](#healthchecks)
 
 If you experiencing any issue, please have a look to the [troubleshooting](troubleshooting.md) page.
 
@@ -126,11 +140,23 @@ For Prometheus you need to set the type to Prometheus and provide a url.
   # subtitle: "Monitor data server"
 ```
 
+## AdGuard Home
+For AdGuard Home you need to set the type to AdGuard, if you have somes issues as 403 responses on requests you need to provide authentification in headers for locations needed as below.
+
+```yaml
+- name: "Adguard"
+  logo: "assets/tools/adguardhome.png"
+  url: "https://adguard.exemple.com"
+  target: "_blank"
+  type: "AdGuardHome"
+```
+
 ## Portainer
 
 This service displays info about the total number of containers managed by your Portainer instance.
 In order to use it, you must be using Portainer version 1.11 or later. Generate an access token from the UI and pass
 it to the apikey field.
+By default, every connected environments will be checked. To select specific ones,add an "environments" entry which can be a simple string or an array containing all the selected environments name.
 
 See https://docs.portainer.io/v/ce-2.11/user/account-settings#access-tokens
 
@@ -140,4 +166,80 @@ See https://docs.portainer.io/v/ce-2.11/user/account-settings#access-tokens
   url: "http://192.168.0.151/"
   type: "Portainer"
   apikey: "MY-SUPER-SECRET-API-KEY"
+  # environments:
+  #   - "raspberry"
+  #   - "local"
 ```
+
+## Emby / Jellyfin
+
+You need to set the type to Emby, provide an api key and choose which stats to show if the subtitle is disabled.
+
+```yaml
+- name: "Emby"
+  logo: "assets/tools/sample.png"
+  url: "http://192.168.0.151/"
+  type: "Emby"
+  apikey: "MY-SUPER-SECRET-API-KEY"
+  libraryType: "music" #Choose which stats to show. Can be one of: music, series or movies.
+```
+
+## Uptime Kuma
+
+Using the Uptime Kuma service you can display info about your instance uptime right on your Homer dashboard.
+
+The following configuration is available for the UptimeKuma service. Needs v1.13.1 or later because of the change in APIs due to [multiple status pages support](https://github.com/louislam/uptime-kuma/releases/tag/1.13.1).
+
+```yaml
+- name: "Uptime Kuma"
+  logo: "assets/tools/sample.png"
+  # subtitle: "A fancy self-hosted monitoring tool" # optional, if no subtitle is defined, Uptime Kuma incidents, if any, will be shown
+  url: "http://192.168.0.151:3001"
+  slug: "myCustomDashboard" # Defaults to "default" if not provided.
+  type: "UptimeKuma"
+```
+
+## Tautulli
+
+The Tautulli service can allow you to show the number of currently active
+streams on you Plex instance. An API key is required, and can be obtained from
+the "Web Interface" section of settings on the Tautulli web UI.
+
+```yaml
+- name: "Tautulli"
+  logo: "assets/tools/sample.png"
+  url: "http://192.168.0.151:8181"
+  type: "Tautulli"
+  apikey: "MY-SUPER-SECRET-API-KEY"
+```
+
+Because the service type and link don't necessarily have to match, you could
+even make the service type Tautulli on your Plex card and provide a separate
+endpoint pointing to Tautulli!
+
+```yaml
+- name: "Plex"
+  logo: "assets/tools/sample.png"
+  url: "http://192.168.0.151:32400/web" # Plex
+  endpoint: "http://192.168.0.151:8181" # Tautulli
+  type: "Tautulli"
+  apikey: "MY-SUPER-SECRET-API-KEY"
+```
+
+## Mealie
+
+First off make sure to remove an existing `subtitle` as it will take precedence if set. 
+Setting `type: "Mealie"` will then show the number of recipes Mealie is keeping organized or the planned meal for today if one is planned. You will have to set an API key in the field `apikey` which can be created in your Mealie installation.
+
+## Healthchecks
+
+This service displays information about the configured status checks from the Healthchecks application.
+Two lines are needed in the config.yml :
+
+```yaml
+  type: "Healthchecks"
+  apikey: "01234deb70424befb1f4ef6a23456789"
+```
+
+The url must be the root url of the Healthchecks application.
+The Healthchecks API key can be found in Settings > API Access > API key (read-only). The key is needed to access Healthchecks API.
